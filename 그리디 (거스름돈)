@@ -1,0 +1,27 @@
+/* 그리디 알고리즘 
+   거스름돈 문제 */ 
+// 이것이 코딩테스트다 파이썬//
+
+< 내 코드>
+
+n = int(input());
+numOfCoin = 0;
+
+numOfCoin = (n // 500) + ((n % 500) // 100) + ((n % 100) // 50) + ((n % 50) // 10);
+
+print(numOfCoin);
+
+//////////////////////////////////////////////////////////
+
+<정답>
+
+n = int(input());
+numOfCoin = 0;
+
+coin_types = [500, 100, 50 ,10];
+
+for coin in coin_types:
+  numOfCoin += n // coin;
+  n %= coin;
+
+print(numOfCoin);

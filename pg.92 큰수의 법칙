@@ -1,0 +1,47 @@
+//z큰 수의 법칙 (실전문제2)//
+//   My Code   //
+n,m,k = list(map(int, input().split()));
+arr = [];
+total =  0;
+count = 0;
+arr = list(map(int, input().split()));
+  
+
+cpyarr = list(arr);
+
+for j in range(m):
+  if count == k:
+    cpyarr.sort(reverse = True);
+    total += cpyarr[1];
+    count = 0;
+  else:
+    total += max(arr);
+    count += 1;
+   
+print(total)
+
+* 굳이 cpyarr = list(arr); 을 할 필요가 없었음
+  -> 위 코드는 배열을 복사하려고 쓴 코드
+  -> cpyarr = arr 로 쓰면 arr 배열이 바뀌면 cpyarr 배열도 바뀜
+  -> 같은 메모리주소를 대입받는다고 생각하면 될듯
+  ->또는 복사를 하고 싶으면 cpyarr = arr.copy() 함수를 사용해도 가능
+* count == k 일 때 마다 sort()를 하지 말고 맨 처음 sort()를 하고 시작하면 실행시간이 빨라질듯
+
+// 수정한 Code //
+
+n,m,k = list(map(int, input().split()));
+arr = [];
+total =  0;
+count = 0;
+arr = list(map(int, input().split()));
+arr.sort(reverse = True);        --> 미리 배열을 sort 해놓는다.
+
+for j in range(m):
+  if count == k:
+    total += arr[1];
+    count = 0;
+  else:
+    total += arr[0]; --> 미리 sort를 해 놓으니까 max 함수를 사용할 필요 없이 바로 맨 앞에 있는 수가 최대
+    count += 1;
+   
+print(total)

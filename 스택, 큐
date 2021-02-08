@@ -1,0 +1,39 @@
+스택 : 후입선출 구조 / 입구와 출구가 동일한 형태
+큐: 선입선출 구조 / 입구와 출구가 모두 따로 존재
+
+<  스택 구현 >
+기본 리스트에서 append() 와 pop() 메서드를 이용하면 됨
+ex) stack =[]
+    stack.append(5) -> [5]
+    stack.append(2) -> [5,2]
+    stack.append(3) -> [5,2,3]
+    stack.pop() -> [5,2]
+    stack.append(4) -> [5,2,4]
+    stack.append(1) -> [5,2,4,1]
+    stack.pop() -> [5,2,4]
+    
+ print(stack) -> [5,2,4]
+ print(stack[::-1]) -> [4,2,5]
+ 
+ < 큐 구현 >
+ collections 모듈에 있는 deque 함수 이용
+ deque -> double ended queue 의 줄임 / 양방향 데이터처리가 가능하다
+ 
+ from collections import deque
+ 
+ queue = deque()
+ 
+ queue.append(5) 
+ queue.append(2)
+ queue.append(3)
+ queue.popleft() -> popleft() 함수는 가장 왼쪽에 있는 원소를 제거한다.
+ queue.append(4)
+ queue.append(1)
+ queue.popleft()
+ 
+ print(queue) -> deque([3,4,1])
+ queue.reverse()
+ print(queue) -> deque(1,4,3])
+ 만약 queue 를 리스트로 만들려면 list(queue)를 사용하면 된다
+ print(list(queue)) -> [1,4,3]
+ 

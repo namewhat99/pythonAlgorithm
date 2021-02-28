@@ -1,0 +1,29 @@
+힙 (heapq) : 우선순위 큐 기능을 구현하고자 할 때 사용된다
+-> 우선순위 큐: : 우선순위가 가장 높은 데이터를 가장 먼저 삭제한다
+스택 : 가장 나중에 들어간 데이터가 가장 먼저 삭제된다
+큐 : 가장 먼저 들어간 데이터가 가장 먼저 삭제된다
+우선순위 큐: 우선순위가 가장 높은 데이터가 가장 먼저 삭제된다
+
+* 파아썬의 힙은 최소 힙 으로 구성되어 있으므로 원소를 힙에 전부 넣었다가 빼는 것 만으로도 시간복잡도 NlogN의 오름차순 정렬*
+--> 최소 힙(Min heap): 값이 낮은 데이터가 가장 먼저 삭제된다
+--> 최대 힙(Max heap): 값이 큰 데이터가 가장 먼저 삭제된다
+
+힙 메서드
+heapq.heappush() -> 힙에 원소를 삽입한다
+heapq.heappop() -> 힙에 원소를 꺼낸다
+
+ex)
+import heapq
+
+def heapsort(iterable):
+  h = []
+  result = []
+  # 모든 원소를 힙에 차례대로 삽입
+  for value in iterable:
+    heapq.heappush(h , value)
+  for i in range(len(h)):
+    result.append(heapq.heappop(h))
+  return result
+
+reuslt = heapsort([4,0,9,1,2,8,6,5,7])
+print(result) -> 오름차순 정렬된 heap

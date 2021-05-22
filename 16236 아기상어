@@ -1,0 +1,78 @@
+import sys
+from collections import deque
+input = sys.stdin.readline
+INF = int(1e9)
+n = int(input())
+board = []
+for i in range(n):
+  board.append(list(map(int, input().split())))
+
+size = 2
+count = 0
+ate = 0
+
+cur_x = 0
+cur_y = 0
+
+for i in range(n):
+  for j in range(n):
+    if board[i][j] == 9:
+      cur_x , cur_y = j , i
+      board[i][j] = 0
+      break
+  '''상어의 현재 위치를 기준으로 bfs를 실행한다. 이때 반환값은 가장 먼저 찾는 물고기가 아니라
+   상어와의 거리를 담는 dist 배열 전체를 return 한다'''
+def bfs():
+  dist = [[-1] * n for _ in range(n)]
+  queue = deque([(cur_y , cur_x)])
+  dist[cur_y][cur_x] = 0
+  x_move = [-1 , 0 , 1 , 0]
+  y_move = [0 , 1 , 0 , -1]
+  while queue:
+    y , x = queue.popleft()
+    for i in range(4):
+      nx = x + x_move[i]
+      ny = y + y_move[i]
+      if 0 <= nx and nx < n and 0 <= ny and ny < n:
+        if dist[ny][nx] == - 1 and board[ny][nx] <= size:
+          dist[ny][nx] = dist[y][x] + 1
+          queue.append((ny , nx))
+  return dist
+'''반환된 배열을 탐색하면서 가장 가까이 있는 물고기를 찾는다. 거리가 같다면 가장 위, 가장 왼쪽에 있는 물고기를 반환하기
+   위해 (0 , 0) 부터 반복문을 돌리면서 실행한다'''
+def search(dist):
+  x , y = 0 , 0
+  min_dist = INF
+  for i in range(n):
+    for j in range(n):
+      if dist[i][j] != -1 and 1 <= board[i][j] and board[i][j] < size:
+        if dist[i][j] < min_dist:
+          y , x = i , j
+          min_dist = dist[i][j]
+  if min_dist == INF:
+    return None
+  else:
+    
+    return y , x , min_dist
+
+while True:
+  #매 초 마다 value값을 갱신한다#
+  value = search(bfs())
+
+  if value == None:
+    print(count)
+    break
+  
+  else:
+    cur_y , cur_x = value[0] , value[1]
+    count += value[2]
+
+    board[cur_y][cur_x] = 0
+    ate += 1
+
+    if ate >= size:
+      size += 1
+      ate = 0
+
+'''1초 , 즉 count가 1 씩 늘어날때 마다 전체 그래프를 두번 완전탐색 한다. 대략 O(n^2)의 시간복잡도를 갖고 
+   n의 범위가 20 이하이므로 1회 실행에 최대 400번의 연산을 실행한다'''

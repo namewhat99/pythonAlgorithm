@@ -1,0 +1,77 @@
+import sys
+input = sys.stdin.readline
+sys.setrecursionlimit(int(1e9))
+
+n = int(input())
+graph = [[] for _ in range(n + 1)]
+dp = [[-1] * (n + 1) for _ in range(n + 1)]
+
+result = 0
+
+for i in range(1 , n + 1):
+  graph[i] = [0] + list(map(int, input().split()))
+
+dx = [1 , 0 , -1 , 0]
+dy = [0 , 1 , 0 , -1]
+'''아래 정답 코드와 다른 점은 dfs 함수를 실행할때 내 코드는 
+   함수를 전부 실행하지만 정답 코드는 함수를 전부 실행하지 않고 바로 리턴하는 경우가 있다'''
+'''dp를 잡을때 나는 그 칸이 마지막 날 일 경우 최댓값을 dp로 잡음. 이렇게 짜면 dp를 이용하기 어려워진다'''
+'''dfs는 함수종료가 가장 나중에 실행된 함수부터 일어난다. 이를 이용하자'''
+def dfs(y , x):
+  for i in range(4):
+    ny = y + dy[i]
+    nx = x + dx[i]
+    if 1 <= ny <= n and 1 <= nx <= n:
+      if graph[ny][nx] > graph[y][x]:
+        if dp[ny][nx] < dp[y][x] + 1:
+          dp[ny][nx] = dp[y][x] + 1
+          dfs(ny , nx)
+  return
+
+#고민했던 부분#
+'''모든 점에서의 판다가 살 수 있는 날의 최댓값을 구하는데 시간 초과 문제때문에
+   모든 점에서 dfs를 돌려야 하는지 아니면 임의의 한 점을 택하고 dfs 를 돌려서 그 
+   사이클 사이에 모든 점의 최댓값이 구해지는지를 놓고 고민했었다'''
+'''한 점에서 dfs를 돌리는 코드를 짜 보긴 했는데 알고리즘에 오류가 있었다. 결국 모든 점엥서
+   dfs를 실행하는것이 맞다고 판단'''
+
+for y in range(1 , n + 1):
+  for x in range(1 , n + 1):
+    if dp[y][x] == -1:
+      dp[y][x] = 1
+      dfs(y , x)
+
+for i in range(1 , n + 1):
+  for j in range(1 , n + 1):
+    result = max(result , dp[i][j])
+
+
+print(result)
+
+
+############ 정답 코드 #############
+
+import sys
+input = sys.stdin.readline
+sys.setrecursionlimit(10**6)
+dx = [1, -1, 0, 0]
+dy = [0, 0, -1, 1]
+def dfs(x, y):
+    if dp[x][y]: return dp[x][y] -> dp 가 0인 경우는 무조건 함수가 실행된다. 결국 시작점이 주변에서 최소인 점은 무조건 dfs가 실행됨
+    dp[x][y] = 1 -> 맨 처음 y , x  점에서의 초기값을 1로 잡는다
+    for i in range(4):
+        nx = x + dx[i]
+        ny = y + dy[i]
+        if 0 <= nx < n and 0 <= ny < n:
+            if s[x][y] < s[nx][ny]:
+                dp[x][y] = max(dp[x][y], dfs(nx, ny) + 1) -> dfs르 돌리면서 그 점에서의 최댓값을 dp로 저장시킨다.
+    return dp[x][y] -> 이때 주변에 그 좌표보다 큰 지점이 없으면 1이 반환된다.
+    그러면 그 지점부터 지나온 지점들에 1씩 더해지면서 결국 그 지점에서 시작할때 최댓값이 구해진다.
+n = int(input())
+s = [list(map(int, input().split())) for i in range(n)]
+dp = [[0] * n for i in range(n)]
+result = 0
+for i in range(n):
+    for j in range(n):
+        result = max(result, dfs(i, j))
+print(result)

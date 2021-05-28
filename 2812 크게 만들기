@@ -1,0 +1,34 @@
+import sys
+input = sys.stdin.readline
+
+
+
+n , k = map(int, input().split())
+t = list(input().rstrip())
+
+result = []
+delete = k
+
+for i in range(n):
+    while delete > 0 and result:
+        if result[-1] < t[i]:
+            result.pop()
+            delete -= 1
+        else:
+            break
+    
+    result.append(t[i])
+
+for i in range(n - k):
+    print(result[i] , end = '')
+
+
+맨 처음 최대 힙으로 접근 하다가 시간초과가 나옴
+
+'''알고리즘은 result의 마지막 원소와 현재 탐색하는 원소를 비교하여
+   마지막 원소가 더 작으면 그 원소를 pop 한다
+   반대의 경우 stack에 계속 쌓는다'''
+만약 숫자를 k 만큼 지우지 못했으면 나중에 반복문에서 뒤에는 사라진다.
+
+'''스택에서는 ㄱ본적인 순서는 유지된다. 따라서 큰 틀에서의 순서가 유지된다멵 
+  스택 , append 와 pop을 사용하는것을 고려해보자'''

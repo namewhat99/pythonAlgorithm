@@ -1,0 +1,116 @@
+import sys
+input = sys.stdin.readline
+from collections import deque
+sys.setrecursionlimit(int(1e9))
+
+n = int(input())
+graph = [[] for _ in range(n + 1)]
+parent = [[] for _ in range(n + 1)]
+dp = [[0 , 0] for _ in range(n + 1)]
+level = [[] for i in range(n + 1)]
+xPos = [0] * (n + 1)
+
+
+for _ in range(n):
+  a , b , c = map(int, input().split())
+  graph[a].append((b , c))
+  if b != -1:
+    parent[b].append(a)
+  if c != -1:
+    parent[c].append(a)
+#각 노드의 왼쪽 자식 노드 갯수 , 오른쪽 자식 노드 갯수 구하는 함수#
+def getWidth(now,  lev):
+  global dp
+  global level
+  level[lev].append(now)
+  for left , right in graph[now]:
+    if left == -1:
+      dp[now][0] = 0
+    else:
+      dp[now][0] = getWidth(left , lev + 1) + 1
+    if right == - 1:
+      dp[now][1] = 0
+    else:
+      dp[now][1] = getWidth(right , lev + 1) + 1
+  return dp[now][0] + dp[now][1]
+
+
+'''노드의 x 좌표를 구한다'''
+''' 부모 노드의 왼쪽노드 x 좌표는 부모의 x좌표  - (현재 노드에서 오른쪽 자식노드 갯수 + 1)'''
+''' 마찬가지로 부모노드의 오른쪽노드 x 좌표는 부모의 x좌표 - (현재 노드에서 왼쪽 자식노드 갯수 + 1)'''
+
+def getXpos(start):
+  global graph
+  global dp
+  global xPos
+  queue = deque()
+  queue.append((start , 0))
+  
+  while queue:
+    now , pPos = queue.popleft()
+    for left , right in graph[now]:
+      if left != -1:
+        xPos[left] = pPos - (dp[left][1] + 1)
+        queue.append((left , xPos[left]))
+      if right != -1:
+        xPos[right] = pPos + (dp[right][0] + 1)
+        queue.append((right , xPos[right]))
+
+'''루트 노드 구하는 함수'''
+# 부모의 갯수가 0개면 루트노드#
+def getRoot(parent):
+  for i in range(1 , len(parent)):
+    if len(parent[i]) == 0:
+      return i
+
+root = getRoot(parent)
+
+getWidth(root , 1)
+getXpos(root)
+
+maxIdx = int(1e9)
+maxWidth = 0
+
+for i in range(1 , n + 1):
+ 
+  if len(level[i]) == 0 or i == n:
+    if n == 1:
+      print(1 , 1)
+    else:
+      print(maxIdx , maxWidth)
+    break
+  else:
+    tmpMax = -int(1e9)
+    tmpMin = int(1e9) 
+    for item in level[i]:
+      tmpMax = max(tmpMax , xPos[item])
+      tmpMin = min(tmpMin , xPos[item])
+    tmp = tmpMax - tmpMin + 1
+    if tmp > maxWidth:
+      maxWidth = tmp
+      maxIdx = i
+
+#dfs 연습하기 좋은 문제#
+#노드의 열은 그 노드에서 자신보다 왼쪽에 있는 노드의 갯수 + 1#
+
+def inorder(idx, level):
+    global turn
+    #LEFT
+    if childl[idx] != -1:
+        inorder(childl[idx], level+1)    #왼쪽 자식 방문
+    #VISIT
+    turn += 1    #열 번호 증가(방문)
+    if levell[level] == 0:    #이 레벨에 처음 방문했다면
+        levell[level] = levelr[level] = turn    #현 열 번호를 이 레벨의 제일 왼쪽 열 번호로 등록
+    else:    #이 레벨에 방문한 적이 있다면
+        levelr[level] = turn    #현 열 번호를 이 레벨의 제일 오른쪽 열 번호로 등록
+    #RIGHT
+    if childr[idx] != -1:
+        inorder(childr[idx], level+1)    #오른쪽 자식 방문
+
+#루트 노드로부터 가장 왼쪽에 있는 노드가 먼저 탐색이 이루어진다. 자신보다 왼쪽에 있는 노드가 없을때까지 먼저 방문#
+그 후 그 레벨에 가장 먼저 방문했으면 그 레벨에서 가장 왼쪽에 있는 노드 , 그 이후로는 점점 오른쪽으로 가는 알고리즘
+
+
+출처: 906bc 님의 코드
+#파이썬 상위권 풀이는 가장 루트노드로 부터 가장 왼쪽에 있는 노드부터 차례로 오면서 +1 씩 해주는 풀이였다#

@@ -1,0 +1,38 @@
+import sys
+from collections import deque
+input = sys.stdin.readline
+
+def solution(board):
+  answer = sys.maxsize
+  dp = [[sys.maxsize] * len(board)  for i in range(len(board[0]))]
+
+  dy = [-1 , 0 , 1 , 0]
+  dx = [0 , -1 , 0 , 1]
+  queue = deque()
+  for i in range(4):
+    queue.append((0 , 0 , 0 , i))
+  
+  while queue:
+    cost , y , x , di = queue.popleft()
+    if y == len(board) - 1 and x == len(board[0]) - 1:
+     answer = min(answer , cost)
+    for i in range(4):
+      ny = y + dy[i]
+      nx = x + dx[i]
+      if 0 <= ny < len(board) and 0 <= nx < len(board[0]):
+        if board[ny][nx] == 0:
+          if di == i:
+            if dp[ny][nx] >= cost + 100:
+              dp[ny][nx] = cost + 100
+              queue.append((cost + 100 , ny , nx , i))
+          else:
+            if dp[ny][nx] >= cost + 600:
+              dp[ny][nx] = cost + 600
+              queue.append((cost + 600 , ny , nx , i))
+
+
+  return answer
+  
+  #알아봐야 할 것#
+ 큐 대신 힙을 쓰면 24개 테스트 케이스 중에 2개가 틀림 why?
+  어차피 최소를 구하는 것 아닌가?

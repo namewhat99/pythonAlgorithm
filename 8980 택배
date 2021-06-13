@@ -1,0 +1,35 @@
+import sys
+
+if __name__ == "__main__":
+    n, c = map(int, sys.stdin.readline().split())
+    m = int(sys.stdin.readline())
+    box = [list(map(int, sys.stdin.readline().split())) for _ in range(m)]
+
+
+    box.sort(key=lambda x:x[1])  # 도착 시간이 빠른 순서로 정렬
+
+    answer = 0  # 최대 박스 수
+    remain = [c] * (n + 1)  # 각 위치에 남은 공간
+
+    for i in range(m):
+        temp = c  # c개를 옮길 수 있다고 가정
+        for j in range(box[i][0], box[i][1]):
+            temp = min(temp, remain[j])
+        temp = min(temp, box[i][2])
+        for j in range(box[i][0], box[i][1]):
+            remain[j] -= temp
+        answer += temp
+
+    print(answer)
+    
+    알고리즘.
+    1. 주어진 택배들을 도착지를 기준으로 오름차순 정렬한다.
+    2. 각 택배들의 대하여 출발지 부터 도착지 - 1 되는 지점까지 최대 용량중 가장 작은것을 선택
+     2-1. 최대용량이 현재 택배보다 크면 택배만큼 뺀다
+     2-2. 그 반대의 경우 남는 용량만큼 뺀다.
+    3. 적재한 용량만큼 정답에 추가해준다.
+    
+    *도착지를 기준으로 오름차순 정렬을 하는 이유는 택배를 적재해서 멀리 갈수록 비효율적이기 때문이다.
+    예를 들어 1-2 보다 1-5 가 앞에 있으면 2-5 를 가는동안 짐을 그대로 트럭에 갖고 있어야 하기 때문에 그만큼의
+    용량을 손해보기 떄문임.
+    

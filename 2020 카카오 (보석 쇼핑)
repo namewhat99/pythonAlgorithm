@@ -1,0 +1,53 @@
+### 내 코드 ###
+정확성은 만점 / 효율성 48.9 /  총점 88.2
+
+def solution(gems):
+  ans = set(gems)
+  len_ans = len(ans)
+  now = {}
+  result = []
+  min_length = 100002
+  for i in range(len(gems)):
+    now[gems[i]] = i
+    if len_ans == len(list(now.keys())):
+      temp = list(now.values())
+      front = min(temp)
+      length = i - front
+      if min_length > length:
+        result = [front + 1 , i + 1]
+        min_length = length
+
+  return result
+  
+  효율성에서 만점이 나오지 못한 것이 아마 if len_ans == len(list(now.keys())) 조건 만족하면 모든 경우에 대해 
+  result 값과 비교를 했기 때문 인 것 같다. 시간복잡도를 고려하여 나름 한번 훑는 알고리즘으로 작성했는데 효율성이 아직도 아쉽다.
+  
+  ## 정답 코드 ###
+   
+  def solution(gems):
+  ANS_LEN = len(set(gems))
+  LAST = len(gems)
+  now = {gems[0] : 1}
+  start , end  = 0 , 0
+  answer = []
+  while start < LAST and end < LAST:
+    if len(now) < ANS_LEN:
+      end += 1
+      if end == LAST:
+        break
+      now[gems[end]] = now.get(gems[end] , 0) + 1
+    else:
+      answer.append((end - start , [start + 1 , end + 1]))
+      now[gems[start]] -= 1
+      if now[gems[start]] == 0:
+        del now[gems[start]]
+      start += 1
+  answer = sorted(answer , key = lambda x : (x[0] , x[1]))
+ 
+  return answer[0][1]
+  
+  투 포인터 알고리즘 사용 / 일단 보석의 가짓수가 모두 모일때 까지 end를 늘리고 그 이후 start 를 늘리는 방식으로 최소 구간을 찾는다.
+  가짓수가 더 적으면 end += 1
+  충분하면 start += 1 
+  이제 되는 모든 가짓수를 answer 에 저장하고 그 이후 가장 짧은 구간을 return.
+  * 딕셔너리.get(x , y) -> 딕셔너리에서 x를 찾는경우 x의 value 반환 , 못 찾는 경우 y 를 반환한다.

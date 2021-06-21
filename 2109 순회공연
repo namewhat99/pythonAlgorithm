@@ -1,0 +1,70 @@
+import sys
+import heapq
+input = sys.stdin.readline
+
+n = int(input())
+
+arr = []
+
+for i in range(n):
+  money , day = map(int, input().split())
+  arr.append([day , money])
+
+arr = sorted(arr , key = lambda x : (-x[0] , -x[1]))
+
+heap = []
+day = 0
+## 모든 원소를 탐색할때 까지 ##
+while len(arr) > 0:
+  ## 하루가 지남##
+  day += 1
+  while True:
+    ## 탐색이 모두 끝나면 종료 ##
+    if len(arr) == 0:
+      break
+    w , d = arr[-1][1] , arr[-1][0]
+    ## 그 날짜 까지의 공연 pop #
+    if d <= day:
+      arr.pop()
+      ## heap 의 길이는 갈 수 있는 공연의 갯수 ##
+      ## 현재 가는 강연의 갯수가 날짜보다 작으면 추가 ##
+      if len(heap) < day:
+        heapq.heappush(heap , [w , d])
+      ## 만약 현재 탐색중인 강연이 힙에서 가장 보수가 작은 것 보다 크면 그 강연을 택한다 ## 
+      elif w > heap[0][0]:
+        heapq.heappop(heap)
+        heapq.heappush(heap , [w , d])
+    else:
+      break
+sum = 0
+
+for i in range(len(heap)):
+  sum += heap[i][0]
+
+print(sum)
+
+** 힙의 길이가 중요한 역할을 한다. **
+
+** 더 간결한 코드 / 더 빠름 **
+import sys
+import heapq
+
+input = sys.stdin.readline
+
+n = int(input())
+
+nums = []
+for _ in range(n):
+    p, d = map(int, input().split())
+    nums.append([d, p])
+
+nums.sort(key = lambda x : x[0])
+sums = []
+
+for num in nums:  # sums 의 길이가 커버 가능한 강연의 갯수 #   
+    heapq.heappush(sums, num[1])
+    if len(sums) > num[0]:
+        heapq.heappop(sums)
+    # 위 코드와 비슷함 , 현재 공연의 날짜보다 힙 안의 강연의 갯수가 크면 힙에서 가장 보수가 가장 작은 강연과 비교
+    # pop을 하던가 그대로 가던가
+print(sum(sums))

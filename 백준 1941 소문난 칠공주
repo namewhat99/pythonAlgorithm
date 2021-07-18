@@ -1,0 +1,49 @@
+** 몫 과 나머지 연산을 이용한 이차원 배열 점근이 신선했음 **
+** 이것도 dfs를 이용한 완전탐색이 배울점 **
+
+
+def dfs(cand ,idx , ycnt):
+  global graph
+  global result
+
+  if ycnt >= 4 or 25 - idx < 7 - len(cand):
+    return
+
+  if len(cand) == 7:
+    if check(cand) == True:
+      result += 1
+    return
+
+  y = idx // 5
+  x = idx % 5
+  
+  nextCand = [i for i in cand]
+  nextCand.append(idx)
+  
+  **idx 가 현재 참조하고 있는 원소 , 카카오 제재 아이디의 now 느낌과 비슷함**
+  if graph[y][x] == 'Y':
+    # 만약 현재 그래프가 Y 이면 y의 갯수 1개 늘리고 idx + 1 해서 다음 dfs 실행
+    dfs(nextCand , idx + 1 , ycnt + 1)
+    # y 가 아니면 y 그대로 , idx 도 그대로 dfs 전달
+  else:
+    dfs(nextCand , idx + 1 , ycnt)
+    
+  ##### 주요한 부분 ####
+  nextCand.pop()
+  dfs(nextCand , idx + 1 , ycnt)
+  ## 이 부분이 없으면 완전탐색이 불가능하다## 
+  위에 부분들은 전부 현재 idx를 cand에 넣고 전달하였다. 완전탐색이 가능하려면 현재 idx 가 있는 배열도 있고 없는 배열도 있을텐데
+  없는 배열을 만들기 위해 현재 idx 를 배열에서 빼고 다음 dfs로 전달한것이다.
+  즉 예를들어 현재 nextCand = [0 , 1 , 2] 이고 idx 가 3 일때, 
+  위에 2개의 dfs 는 nextCand ㅇ에 [0 , 1 , 2 ,3] 을 넣고 전달한 것이고 아래 dfs 는 [0 , 1 , 2] 가 전달된 것 이다..
+  
+  이로인해 모든 원소를 참조하는 완전탐색이 가능하다.
+
+graph = [[] for _ in range(5)]
+result = 0
+
+현재까지 느낀 dfs의 특징이라하면 , 탈출 조건이 함수의 초반에 있어서, 그 조건을 만족하면 바로 함수가 끝난다.
+그리고 dfs는 함수의 숫자만 바뀐 동일한 함수의 연속이라 생각하면 될 듯 하다는게 지금까지의 생각이다.
+* 탈출 조건 , return , 그리고 완전탐색이라면 모든 경우를 생각하는지 가 중요하다 생각**
+
+

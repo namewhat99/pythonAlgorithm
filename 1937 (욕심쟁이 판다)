@@ -1,0 +1,55 @@
+import sys
+input = sys.stdin.readline
+sys.setrecursionlimit(int(1e9))
+
+n = int(input())
+graph = [[] for _ in range(n)]
+dp = [[0] * n for _ in range(n)]
+for i in range(n):
+  graph[i] = list(map(int, input().split()))
+
+dx = [1 , 0 , -1 , 0]
+dy = [0 , 1 , 0 , -1]
+
+def dfs(y , x):
+  # dfs의 중요부분 , 어느 조건을 만족하면 바로 return #
+  # 만약 이미 dfs로 지나간 좌표면 바로 그 값 return #
+  if dp[y][x] > 0:
+    return dp[y][x]
+  #아직 지나간 부분이 아니라면#
+  else:
+    flag = 0
+    #그 좌표에 인접한 4 방향 탐색#
+    for i in range(4):
+      ny = y + dy[i]
+      nx = x + dx[i]
+      if 0 <= ny < n and 0 <= nx < n:
+        # 그 좌표보다 큰 점이면 그 좌표의 값을 가져온다#
+        if graph[ny][nx] > graph[y][x]:
+          flag = 1
+          # 그 전에 방문했던 점이면 바로 dp에서 가져오고#
+          if dp[ny][nx] >= 1:
+            dp[y][x] = max(dp[y][x] , dp[ny][nx] + 1)
+          # 아니라면 dfs 를 돌려준다 #
+          else:
+            dp[y][x] = max(dp[y][x] , dfs(ny , nx) + 1)
+    #그 좌표가 인접부분중 가장 큰 좌표면 1 return#
+    if flag == 0:
+      dp[y][x] = 1
+
+  return dp[y][x]
+
+result = 0
+
+for i in range(n):
+  for j in range(n):
+    result = max(dfs(i , j) , result)
+
+
+print(result)
+
+**dfs(y , x) 자체를 y , x 에서 어떤 함수를 실행해 그 결과를 얻어온다고 생각하면 될듯하다
+  뭔가 재귀함수라서 느낌이 어색할때가 있지만 간단하게 그 좌표나 그 조건상에서 함수를 실행한다고 
+  생각하면 간단하다.
+  위 문제를 예시로 들면 dfs(ny , nx) 는 graph[ny][nx]에서의 최대로 움직일 수 있는 거리를 나타낸다.
+**dp 와 dfs를 함께 써서 푼 문제**

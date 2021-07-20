@@ -1,0 +1,41 @@
+def solution(str1, str2):
+    dicA = {}
+    dicB={}
+    str1 = str1.lower()
+    str2 = str2.lower()
+
+    ## 만약 딕셔너리에 해당 문자열이 없으면 해당 문자열을 추가하고 1 , 있으면 그냥 횟수 추가 ##
+    for i in range(len(str1)-1):
+        if str1[i].isalpha() and str1[i+1].isalpha():
+            dicA[str1[i]+str1[i+1]] = dicA.get(str1[i]+str1[i+1],0)+1
+    for i in range(len(str2)-1):
+        if str2[i].isalpha() and str2[i+1].isalpha():
+            dicB[str2[i]+str2[i+1]] = dicB.get(str2[i]+str2[i+1],0)+1
+
+    print(dicA,dicB)
+    common = 0
+    for a in dicA:
+        if a in dicB:
+            common += min(dicA[a], dicB[a])
+            
+    # 교집합 구하는 코드, 만약 a 에 있는 원소가 b 에도 있으면 그 갯수가 더 적은 값으로 택함 #
+    
+    lenA = sum(dicA.values())
+    lenB = sum(dicB.values())
+    
+    # total 이 합집합 , a집합 + b집합 - 교집합 으로 계산
+    
+    total = lenA + lenB - common
+    if total == 0:
+        return 65536
+
+    return int(65536 * common / total)
+    
+    
+  **문자열과 딕셔너리에 매우 취약하다는 것을 알았다**
+  
+  1. .lower() -> 문자열을 전부 소문자로 바꿔준다 (대문자 포함)
+     .upper() -> 반대로 문자열을 대문자로 바꿔줌
+     
+  2. dic.get('key' , 0) -> 딕셔너리에 key 값이 없으면 0 반환
+      즉 위 코드에서는 딕셔너리에 해당 key 가 없을때 0 을 반환시키고 그 문자열을 dic 에 추가

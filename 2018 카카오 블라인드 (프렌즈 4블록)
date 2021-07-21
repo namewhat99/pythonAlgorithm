@@ -1,0 +1,60 @@
+def erase(graph , m , n , check):
+    total = 0
+    newGraph = []
+    s = set()
+    for i in range(m):
+        cnt = 0
+        arr = []
+        for j in range(n):
+            if check[i][j] == 0:
+                arr.append(graph[i][j])
+            else:
+                cnt += 1
+                
+        arr = arr + [1] * cnt
+        total += cnt
+        newGraph.append(arr)
+
+    return (newGraph  , total)
+
+** 오래 걸렸던 부분 **
+
+문자열 , 배열에서 check 가  0인 부분은 남겨서 앞쪽으로 땡기고 1인 부분은 뒤에 1로 붙이는 작업
+
+나의 아이디어는 check 가 0이면 새로운 배열에 append , 1 이면 그 cnt 를 올리고 나중에 배열을 다 돌았을때
+뒤에다 cnt 의 갯수만큼 1로 붙이는 방법
+
+def eraseCheck(graph , m , n):
+    newGraph = copy.deepcopy(graph)
+    flag = 0
+    for i in range(m - 1):
+        for j in range(n - 1):
+            if graph[i][j] == graph[i][j + 1] == graph[i + 1][j] == graph[i + 1][j + 1] != '0':
+                flag = 1
+                newGraph[i][j] = '1'
+                newGraph[i + 1][j] = '1'
+                newGraph[i][j + 1] = '1'
+                newGraph[i + 1][j + 1] = '1'
+
+    if flag == 1:
+        cnt = 0
+        t = []
+    
+        for i in range(m):
+            
+            s = ''.join(newGraph[i]).replace('1' , '')
+            s = list(s)
+            cnt += (n - len(s))
+            s = ['0'] * (n - len(s)) + s
+            
+            t.append(s)
+            
+        return (t  , cnt)
+    
+    else:
+        return (False , 0)
+    
+** 다른분의 아이디어**
+  ''.join() -> 문자열을 합친다 '' 안의 문자는 중간에 들어감
+  .replace('0' , '') -> 문자열 안에 0을 ''로 바꾼다
+  중간에 있는 '1'로 바뀐 문자들을 없애고 그 사이를 붙인다, 그리고 그 갯수만큼 뒤에 임의의 수를 붙여서 만든다.

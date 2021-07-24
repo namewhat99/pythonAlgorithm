@@ -1,0 +1,41 @@
+
+def solution(lines):
+    log = []
+    answer = 0
+
+    for line in lines:
+        d , e , t = line.split()
+        e = e.split(':')
+        t = float(t[:-1])
+
+        end = (int(e[0]) * 60 * 60 + int(e[1]) * 60 + float(e[2])) * 1000
+        start = end - t * 1000 + 1
+        
+        log.append([start , end])
+
+    for time in log:
+        answer = max(answer , getTraffic(log , time[0] , time[0] + 1000) , getTraffic(log , time[1] , time[1] + 1000))
+
+    return answer
+
+def getTraffic(log , start , end):
+    cnt = len(log)
+    for x in log:
+        # 범위 중요, 시작점이나 끝 점을 모두 포함시키면 탐색범위가 1001ms 가 되버린다. 다른 문제에서도 주의하자 ##
+        if x[0] >= end or x[1] < start:
+            cnt -= 1
+    
+    return cnt
+
+
+print(solution(lines))
+
+** 모든 1000ms 마다 탐색을 하면 시간초과가 나온다. 생각을 해보면 각 구간의 시작점 , 종료점을 제외하면 트래픽의 갯수가 바뀌는 지점이 없다
+   따라서 각 로그의 시작점부터 999ms , 종료점부터 999ms 탐색을 해서 트래픽이 최대인 구간을 구하면 모든 구간을 탐색할 필요가 없다**
+
+** 시간 처리도 중요했는데 다른 문제에서도 만약 시간이 오름차순으로 정렬해도 무방한 , 즉 다음날이나 이전날과 상관이 없다면 가장 작은 단위로 
+   변환해서 문제를 푸는것도 좋은 방법이다 **
+ 
+** 문자열 처리 .split('') split 안 의 파리미터를 기준으로 분할된 리스트를 반환해준다.
+    첫번째 line.split() 의 경우 공백 (스페이스바)를 기준으로 분할 리스트 반환
+    두번째 e.split(':') 의 경우 ':' 을 기준으로 한 분할리스트 반환 **

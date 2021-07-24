@@ -1,0 +1,118 @@
+def getMelody(melody , durTime):
+    t = 0
+    now = 0
+    arr = []
+    l = len(melody)
+    while True:
+        if melody[now % l].isalpha() and melody[(now + 1) % l].isalpha():
+            arr.append(melody[now % l])
+            t += 1
+            now += 1
+        
+        elif melody[now % l].isalpha() and melody[(now + 1) % l] == '#':
+            ch = ''
+            ch += (melody[now % l] + '#')
+            arr.append(ch)
+            t += 1
+            now += 2
+        
+        if t >= durTime:
+            break
+    
+    return arr
+
+
+def solution(m, musicinfos):
+    result = []
+
+    for line in musicinfos:
+        s , e , title , melody = line.split(',')
+
+        s = s.split(':')
+        s = 60 * int(s[0]) + int(s[1])
+        e = e.split(':')
+        e = 60 * int(e[0]) + int(e[1])
+        durTime = e - s + 1
+        tmp = []
+        now , k = 0 , len(m)
+        while True:
+
+            if m[now % k].isalpha() and m[(now + 1) % k].isalpha():
+                tmp.append(m[now % k])
+                now += 1
+            
+            elif m[now % k].isalpha() and m[(now + 1) % k] == '#':
+                tmp.append(m[now % k] + '#')
+                now += 2
+            
+            if now >= k:
+                break
+            
+        
+        
+        melody = getMelody(melody , durTime)
+        
+        for i in range(len(melody) - len(tmp) + 1):
+            for j in range(len(tmp)):
+                if melody[i + j] != tmp[j]:
+                    break
+            else:
+                result.append((durTime , s , title))
+        
+    result = sorted(result , key = lambda x : (-x[0] , x[1]))
+    
+    if len(result) == 0:
+        return (None)
+    return result[0][2]
+    
+** 제출하고 처음 AC 를 받은 코드 / 상당히 지저분하고 맘에 들지 않음 **
+** C , C# 등 기본 음 과 # 포함음 처리할때 함수를 하나 만들어서 처리했으면 더 깔끔했을듯, 코드 기획 단계에서 미스가 생김 **
+** 맨 처음 코드 기획이 잘못되어서 코드를 다 짜고 다시 수정하는데 시간이 오래 걸림, 기획 단계에서 더 신중하게 짜야될듯 **
+
+# 다른 분들의 아이디어를 보니까 좋은게 많았다. #이 들어간 문자, 즉 C# , F# , A# 등을 소문자로 처리해서 c , f , a 코드가 더 깔끔함 #
+# 문자열에서도 in 을 쓸 수 있다는 점을 알았다. #
+
+def getMelody(melody , durTime):
+    
+    l = len(melody)
+    arr = ''
+    arr += melody * (durTime // l)
+
+    for i in range(durTime % l):
+        arr += melody[i]
+    
+    return arr
+    
+def toLower(s):
+    s = s.replace('C#','c').replace('D#','d').replace('F#','f').replace('G#','g').replace('A#','a')
+    return s
+
+def solution(m, musicinfos):
+    result = []
+
+    for line in musicinfos:
+        s , e , title , melody = line.split(',')
+
+        s = s.split(':')
+        s = 60 * int(s[0]) + int(s[1])
+        e = e.split(':')
+        e = 60 * int(e[0]) + int(e[1])
+        durTime = e - s + 1
+
+        melody = toLower(melody)
+        m = toLower(m)
+
+        melody = getMelody(melody , durTime)
+        
+        if m in melody:
+            result.append((durTime , s , title))
+        
+    result = sorted(result , key = lambda x : (-x[0] , x[1]))
+    
+    if len(result) == 0:
+        return '(None)'
+
+    return result[0][2]
+
+** 다른 분들의 아이디어 참고해서 다시 짜 본 코드 ** 
+** 문자열 길이 늘리고 줄일때 늘이는 길이에 주의 하자 **

@@ -1,0 +1,53 @@
+cand = []
+def getAble(n , relation):
+    global cand
+    result = set()
+    for now in cand:
+        x = set()
+        for j in range(len(relation)):
+            h = tuple(relation[j][i] for i in now)
+            x.add(h)
+        
+        if len(x) == n:
+            result.add(tuple(i for i in now))
+    
+    return result
+
+def getAll(arr , n , now):
+    if now > n :
+        cand.append(arr)
+        return
+    
+    arr1 = [i for i in arr]
+    arr2 = [i for i in arr]
+    arr1.append(now)
+    getAll(arr1 , n , now + 1)
+    getAll(arr2 , n , now + 1)
+
+def solution(relation):
+    n = len(relation[0])
+    result = []
+    getAll([] , n - 1 , 0)
+    keyResult = list(getAble(len(relation) , relation))
+    keyResult = sorted(keyResult , key = lambda x : len(x))
+    keyResult.reverse()
+    print(keyResult)
+    while keyResult:
+        x = keyResult.pop()
+        
+        for item in result:
+            if set(x) | set(item) == {i for i in x}:
+                break
+        else:
+            result.append(x)
+                
+    return len(result)
+    
+1. set의 교집합 연산 => &
+   set의 합집합 연산 => |
+ 1-1. 어느 집합이 다른 집합에 포함되어 있는지, 즉 부분집합인지를 판별할때 위의 연산을 잘 
+2. (i for i in arr) 의 형태로 쓰면 안됨
+    예를 들어 arr = [1,2,3] 이고 이 원소를 포함하는 튜플을 만들려면 tuple(i for i in arr) 의 형태로 써야 제대로 출력된다
+    
+3. list 반복문 도중에 remove 를 사용하면 원 배열에 훼손이 일어나서 모든 원소를 순회할 수 없다. (실수 주의)
+   

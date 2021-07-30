@@ -1,0 +1,78 @@
+import sys
+import heapq
+input = sys.stdin.readline
+INF = int(1e9)
+
+
+n , m , x = map(int, input().split())
+
+graph = [[] for _ in range(n + 1)]
+rev_graph = [[] for _ in range(n + 1)]
+
+distance = [INF] * (n + 1)
+rev_distance = [INF] * (n + 1)
+
+def dijkstra(start):
+    
+    q = []
+    heapq.heappush(q , (0 , start))
+    distance[start] = 0
+
+    while q:
+        dist , now = heapq.heappop(q)
+        
+        if distance[now] < dist:
+            continue
+        
+        for i in graph[now]:
+            cost = dist + i[1]
+            if cost < distance[i[0]]:
+                distance[i[0]] = cost
+                heapq.heappush(q , (cost , i[0]))
+
+def rev_dijkstra(start):
+    
+    q = []
+    heapq.heappush(q , (0 , start))
+    rev_distance[start] = 0
+
+    while q:
+        dist , now = heapq.heappop(q)
+        
+        if rev_distance[now] < dist:
+            continue
+        
+        for i in rev_graph[now]:
+            cost = dist + i[1]
+            if cost < rev_distance[i[0]]:
+                rev_distance[i[0]] = cost
+                heapq.heappush(q , (cost , i[0]))
+
+for _ in range(m):
+    a , b , c = map(int, input().split())
+    graph[a].append((b , c))
+    rev_graph[b].append((a , c))
+
+dijkstra(x)
+rev_dijkstra(x)
+
+
+result = 0
+for i in range(1 , n + 1):
+    result = max(result , distance[i] + rev_distance[i])
+
+print(result)
+
+** 다익스트라 복습 겸 풀어본 문제 치고는 제대로 풀지 못했다 **
+
+1. 다익스트라의 시간복잡도는 ElogV이다, 이때 E는 간선의 갯수, V 는 노드의 갯수이다.
+
+2. 처음에는 모든 노드들에 대해 다익스트라를 쓰려 했다. 그런데 노드의 갯수가 1000 개 이고 간선의 갯수가 10000 이면 시간초과가 나겠구나 생각
+
+3. 다른 방법으로 풀긴 했는데, 
+
+  1. 문제의 예시처럼 각 노드들이 2번까지 오는데 걸리는 거리 + 2번에서 돌아가는데 걸리는 거리 의 값의 최댓값을 구해주면 된다.
+  2. 이중에서 후자 , 즉 2번에서 돌아가는데 걸리는 거리는 그냥 다익스트라로 처리
+  3. 전자는 각 간선의 방향을 역방향으로 바꿔서 풀 수 있다. 즉 1 ->2 의 cost 가 3 이엇으면 그 역방향은 2 -> 1 의 cost 가 3이되는 것이다.
+  4. 그걸 구현한 것이 rev_dijkstra 이다.
+    

@@ -1,0 +1,103 @@
+import sys
+import copy
+import heapq
+INF = int(1e9)
+input = sys.stdin.readline
+
+n , m = map(int, input().split())
+graph = [[] for _ in range(n + 1)]
+
+for _ in range(m):
+    a , b , c = map(int, input().split())
+    graph[a].append((b , c))
+    graph[b].append((a , c))
+
+distance = [INF] * (n + 1) 
+edge = set()
+q = []
+heapq.heappush(q , (0 , 1 , []))
+
+# 최단거리에 영향을 미치는 간선들만 뽑아서 막고 검사해보면 됨 #
+# 모든 간선들을 막고 다익스트라를 돌리면 TLE 가 뜰 가능성 높음 #
+while q:
+    dist , now , vis = heapq.heappop(q)
+    
+    if now == n:
+        if dist < distance[n]:
+            
+            distance[n] = dist
+            edge.clear()
+            for item in vis:
+                edge.add(item)
+
+        elif dist == distance[n] and dist < INF:
+            for item in vis:
+                edge.add(item)
+       
+    if dist > distance[now]:
+        continue
+    
+    for i in graph[now]:
+        cost = dist + i[1]
+        # 다익스트라를 사용할 때 주의점 #
+        # 만약 최소 거리가 아닌 경로도 같이 구하면 여러개의 경로가 있을 수 있다 #
+        # 이때는 최소거리와 같은 거리도 포함 시켜줘야 여러 경로를 모두 구할 수 있음 #
+        # cost <= distance[i[0]] 에 등호도 포함 시켜주는 부분 #
+        
+        if cost <= distance[i[0]]:
+            distance[i[0]] = cost
+            # newVIs 를 설정하는 이유는 첫번째 반복문 돌릴때 vis 에 원소를 append 해서
+            # heapq 에 그대로 넣어주면 다음 반복문에서 영향을 미침 #
+            newVis = [i for i in vis]
+            newVis.append((now , i[0]))
+            heapq.heappush(q , (cost , i[0] , newVis))
+
+
+short = distance[n]
+result = short
+
+for item in edge:
+
+    newGraph = copy.deepcopy(graph)
+    distance = [INF] * (n + 1)
+
+    for x in newGraph[item[0]]:
+        if x[0] == item[1]:
+            v = x[1]
+    
+    for x in newGraph[item[1]]:
+        if x[0] == item[0]:
+            w = x[1]
+    # 처음에 양방향 간선인지 모르고 풀다가 틀림, 문제 제대로 읽어야될듯 #
+    newGraph[item[0]].remove((item[1] , v))
+    newGraph[item[1]].remove((item[0] , w))
+
+    q = []
+    heapq.heappush(q , (0 , 1))
+
+    while q:
+
+        dist , now = heapq.heappop(q)
+
+        if now == n:
+            result = max(result , dist)
+            break
+        
+        for i in newGraph[now]:
+            cost = dist + i[1]
+
+            if cost < distance[i[0]]:
+                distance[i[0]] = cost
+                heapq.heappush(q , (cost , i[0]))
+    
+    else:
+        print(-1)
+        sys.exit(0)
+    
+if len(edge) == 0:
+    print(-1)
+
+else:
+    print(result - short)
+
+** 다익스트라 관련 문제, 다익스트라에 경로 가 포함되면 등호도 고려대상 **

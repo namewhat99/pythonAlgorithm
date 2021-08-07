@@ -1,0 +1,84 @@
+from collections import deque
+
+def solution(board):
+
+    n = len(board)
+
+    dx = [1 , 0 , -1 , 0]
+    dy = [0 , 1 , 0 , -1]
+
+    queue = deque()
+    queue.append((0 , 0 , 0 , 1 , 0))
+
+    visited = set()
+
+    while queue:
+
+        y1 , x1 , y2 , x2 , t = queue.popleft()
+
+        if y1 == n -1 and x1 == n - 1:
+            return t
+        
+        if y2 == n - 1 and x2 == n - 1:
+            return t
+        # 로봇의 이동 구현 부분이다. 
+        for i in range(4):
+            ny1 , nx1 = y1 + dy[i] , x1 + dx[i]
+            ny2 , nx2 = y2 + dy[i] , x2 + dx[i]
+
+            if 0 <= ny1 < n and 0 <= ny2 < n and 0 <= nx1 < n and 0 <= nx2 < n:
+
+                if board[ny1][nx1] == 0 and board[ny2][nx2] == 0 and (ny1 , nx1 , ny2 , nx2) not in visited: 
+                    queue.append((ny1 , nx1 , ny2 , nx2 , t + 1))
+                    visited.add((ny1 , nx1 , ny2 , nx2))
+        ** 로봇이 수평으로 놓여 있을때 이다. 회전은 x1 , y1 또는 x2, y2 부분이 모두 회전 가능하므로 경우의 수를 나눠서 작성하였다 **
+        ** deque 자료구조는 popleft 와 append 를 사용할경우, 아이템이 들어온 순서대로 나가기 때문에 앞에 들어온 좌표들의 t 값이 더 
+           작을 수 밖에 없다. 이 점을 이용해서 visited 를 set 으로 구현한 것이다. 다시 그 지점을 방문하면 t 값은 이전 값 보다 같거나 클 수 밖에 없음 **
+        if y1 == y2:
+            if 0 <= y1 - 1 < n and 0 <= x1 < n and 0 <= x2 < n:
+                if board[y1 - 1][x1] == 0 and board[y1 - 1][x2] == 0:
+                    if (y1 - 1 , x2 , y2 , x2) not in visited:
+                        queue.append((y1 - 1 , x2 , y2 , x2 , t + 1))
+                        visited.add((y1 - 1 , x2 , y2 , x2))
+                    if (y1 , x1 , y1 - 1 , x1) not in visited:
+                        queue.append((y1 , x1 , y1 - 1 , x1 , t + 1))
+                        visited.add((y1 , x1 , y1 - 1 , x1))
+
+            if 0 <= y1 + 1 < n and 0 <= x1 < n and 0 <= x2 < n:
+                if board[y1 + 1][x1] == 0 and board[y1 + 1][x2] == 0:
+                    if (y1 + 1 , x1 + 1 , y2 , x2) not in visited:
+                        queue.append((y1 + 1 , x2 , y2 , x2 , t + 1))
+                        visited.add((y1 + 1 , x2 , y2 , x2))
+                    if (y1 , x1 , y1 + 1 , x1) not in visited:
+                        queue.append((y1 , x1 , y1 + 1 , x1 , t + 1))
+                        visited.add((y1 , x1 , y1 + 1 , x1))
+        ** 로봇이 수직 방향으로 놓여있을때 회전 구현 **
+        if x1 == x2:
+            if 0 <= x1 - 1 < n and 0 <= y1 < n and 0 <= y2 < n:
+                if board[y2][x1 - 1] == 0 and board[y1][x1 - 1] == 0:
+                    if (y1 - 1 , x1 - 1 , y2 , x2) not in visited:
+                        queue.append((y2 , x1 - 1 , y2 , x2 , t + 1))
+                        visited.add((y2 , x1 - 1 , y2 , x2))
+                    if (y1 , x1 - 1 , y1 , x1) not in visited:
+                        queue.append((y1 , x1 - 1 , y1 , x1 , t + 1))
+                        visited.add((y1 , x1 - 1 , y1 , x1))
+
+            if 0 <= x1 + 1 < n and 0 <= y1 < n and 0 <= y2 < n:
+                if board[y1][x1 + 1] == 0 and board[y2][x1 + 1] == 0:
+                    if (y2 , x1 + 1 , y2 , x2) not in visited:
+                        queue.append((y2 , x1 + 1 , y2 , x2 , t + 1))
+                        visited.add((y2 , x1 + 1 , y2 , x2))
+                    if (y1 , x1 , y1 , x1 + 1) not in visited:
+                        queue.append((y1 , x1 , y1 , x1 + 1 , t + 1))
+                        visited.add((y1 , x1 , y1 , x1 + 1))
+                
+
+
+print(solution([[0, 0, 0, 1, 1],[0, 0, 0, 1, 0],[0, 1, 0, 1, 1],[1, 1, 0, 0, 1],[0, 0, 0, 0, 0]]))
+
+** 전형적인 그래프 문제였다, 로봇이 차지하는 칸 수가 2개여서 visited 배열을 따로 만들기 보다는 set을 활용하여 방문 지점을 표시하는게 
+   더 좋겠다는 생각이 들었다 **
+** 로봇의 이동은 구현이 어렵지 않았다. 하지만 로봇의 회전을 구현할때 노가다 방법 밖에 없나라는 생각이 들었는데 결국 모든 경우의 수를 노가다로
+   구현했다 **
+** 중간에 회전 구현하면서 x1 , y1 그리고 x2 , y2 의 위치에 따라 회전을 다르게 짜야 하나 라는 의문이 들었다. 수평 방향 으로 로봇이 놓여져 있을 때를 기준으로 
+   잡을때 (x1 , y1) (x2,  y2) 그리고 (x2 , y2) (x1 , y1) 둘이 회전을 다르게 해야 하나 라는 의문이었는데 결국 동일하다. 

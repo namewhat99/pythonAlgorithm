@@ -1,0 +1,48 @@
+import sys
+input = sys.stdin.readline
+
+n , m , l = map(int, input().split())
+
+arr = sorted(list(map(int, input().split())))
+
+
+def canStop(target):
+    
+    cnt = 0 
+
+    for i in range(1 , len(arr)):
+        cnt += (arr[i] - arr[i - 1] - 1) // target
+
+    cnt += ((arr[0] - 1) // target) + ((l - arr[-1] - 1) // target)
+
+    if cnt >= m:
+        return cnt 
+    else:
+        return False
+
+
+start , end = 1 , l
+ans = l
+
+while start <= end:
+
+    mid = (start + end) // 2
+    
+    k = canStop(mid)
+    if k > m:
+        start = mid + 1
+
+    else:
+        # ans = mid #
+        -> 고민해봐야 할 부분, 맨 처음에는 if 에 k >= m 을 조건으로 쓰고 if 안에 ans 를 배치하니까 예제 답이 71 이 나온다. 
+           ans의 배치가 대해 최솟값 / 최댓값을 구하는 문제에 따라 달라지는듯 하다 지금까지 예상으로는
+        end = mid - 1
+
+print(ans)
+
+** 파라메트릭 서치 (이분 탐색과 비슷) 의 유형 **
+** canStop 함수에서 시간을 줄이기 위해 배열을 한번 훑는 대신 중간에 들어 갈 수 있는 휴게소 갯수만 (거리 - 1) 에서 나눠서 구함 **
+** 파라메트릭 서치에서 ans 부분의 배치를 더 고민해봐야 할 듯 하다, 이 부분에서 시간을 많이 잡아먹음**
+** 파라메트릭 서치 VS 완전탐색 유형
+    -> 현재 까지 고민한 바 로는 숫자의 범위가 작으면 완전탐색도 하나의 방법이 될 수 있단느 결론, 문제를 더 풀어보며 경험을 쌓아야 할 듯
+# 참고 0 과 72 사이에 휴게소를 세우려면 36 에 세우는데 (72 - 0) // 36 은 2 가 나온다. 그래서 -1 을 해주고 71 // 36 을 해야 정확한 답이 나옴.

@@ -36,3 +36,47 @@ def solution(board):
   #알아봐야 할 것#
  큐 대신 힙을 쓰면 24개 테스트 케이스 중에 2개가 틀림 why?
   어차피 최소를 구하는 것 아닌가?
+  
+ -> 한 지점에 여러개의 값으로 도착하는데, 최솟값에서 결과적으로 답이 나오지 않는 경우를 커버 못하는 듯 하다.
+    이를 커버하기 위해 어느 지점에 head 값에 따라 최솟값을 따로 저장해 3차원 dp를 이용했다.
+    
+    import sys
+import heapq
+from collections import deque
+
+def solution(board):
+    n = len(board)
+    dp = [[[sys.maxsize] * 4 for _ in range(n)] for _ in range(n)]
+    q = deque()
+    dx = [-1 , 0 , 1 , 0]
+    dy = [0 , -1 , 0 , 1]
+
+    q.append((0 , 0 , 0 , 2))
+    q.append((0 , 0 , 0 , 3))
+    dp[0][0] = [0,0,0,0]
+    
+    while q:
+        cost , y , x , head = q.popleft()
+        
+                
+        if cost > dp[y][x][head]:
+            continue
+                
+        for i in range(4):
+            nx = x + dx[i]
+            ny = y + dy[i]
+            if 0 <= nx < n and 0 <= ny < n:
+                if board[ny][nx] == 0:
+                  if i % 2 == head % 2:
+                      if cost + 100 <= dp[ny][nx][head]:
+                        dp[ny][nx][head] = cost + 100
+                        q.append((cost + 100 , ny , nx , i))
+                  else:
+                      if cost + 600 <= dp[ny][nx][head]:
+                        dp[ny][nx][head] = cost + 600
+                        q.append((cost + 600 , ny , nx , i))
+                        
+    return min(dp[n - 1][n - 1])
+
+# 결론 : 가중치가 있는 그래프 문제는 다익스트라를 먼저 생각해보는 것이 맞다. 이 문제 같은 경우는 cost를 저장하면서 bfs + dp 로도 풀이가 가능했다. 
+         맨 처음 생각난 풀이는 다익스트라 였는데 이를 확인할 수 있었던 문제.

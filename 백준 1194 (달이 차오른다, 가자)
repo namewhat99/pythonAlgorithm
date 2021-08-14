@@ -1,0 +1,63 @@
+import sys
+import copy
+input = sys.stdin.readline
+from collections import deque
+
+n , m = map(int, input().split())
+
+arr = [[] for _ in range(n)]
+
+
+for i in range(n):
+    arr[i] = list(input().rstrip())
+    for j in range(m):
+        if arr[i][j] == '0':
+            nowY , nowX = i , j
+            arr[i][j] = '.'
+
+
+queue = deque()
+queue.append((nowY , nowX , 0 , 0))
+
+visited = set()
+visited.add((nowY , nowX , 0))
+## 방문했던 지점을 똑같은 key 조합으로 방문하는 것은 의미가 없다 , 따라서 key 와 함께 y , x 좌표를 함께 저장해서 visited 셋을 만든다 ##
+dx = [1 , 0 , -1 , 0]
+dy = [0 , 1 , 0 , -1]
+
+while queue:
+
+    y , x , key , t = queue.popleft()
+    newKey = copy.deepcopy(key)
+    
+    for i in range(4):
+
+        ny = y + dy[i]
+        nx = x + dx[i]
+        newKey = copy.deepcopy(key)
+        ## bfs 돌릴때 실수하는 부분, 다음 루프로 넘어갈때 만약 key 를 바꿔서 전달하면 각각의 반복문 뿐 만 아니라 그 다음 반복문에도 영향을 미친다 ##
+        ## 이 점 주의하자, 다음 루프에 넘길때는 변수를 하나 더 만들어서 그 변수를 바꿔서 전달하는것 ##
+        if 0 <= ny < n and 0 <= nx < m:
+
+            if arr[ny][nx] == '.' and (ny , nx , key) not in visited:
+                queue.append((ny , nx , newKey , t + 1))
+                visited.add((ny , nx , newKey))
+            
+            elif arr[ny][nx].islower() and  (ny , nx , key) not in visited:
+                newKey |= (1 << ord(arr[ny][nx]) - ord('a'))
+                queue.append((ny , nx , newKey , t + 1))
+                visited.add((ny , nx , newKey))
+            
+            elif arr[ny][nx].isupper() and (ny , nx , key) not in visited:
+                if key & (1 << ord(arr[ny][nx].lower()) - ord('a')) > 0:
+                    queue.append((ny , nx , newKey , t + 1))
+                    visited.add((ny , nx , newKey))
+            
+            elif arr[ny][nx] == '1':
+                print(t + 1)
+                sys.exit(0)
+else:
+    print(-1)
+    
+## bfs + 비트마스킹 + dp 문제 ##
+## 비트마스킹을 이용해 현재 갖고 있는 key 를 나타낸다 ##

@@ -1,0 +1,77 @@
+import sys
+sys.setrecursionlimit(10**9)
+## dfs , 재귀 를 쓸때 런타임 에러면 재귀제한 생각 ##
+cnt = 0
+
+## 무방향 그래프를 방향 그래프로 만들어준다, 위상정렬을 사용하기 위해 ##
+def getDirection(now):
+
+    visited[now] = True
+    
+    for i in graph[now]:
+        if not visited[i]:
+            dir_graph[now].append(i)
+            preVisit[now].append(i)
+            inDegree[i] += 1
+            getDirection(i)
+## 위상정렬 ##
+def dfs(now):
+    global cnt
+
+    visited[now] = True
+    ## 어느 지점을 방문하면 그 지점의 후순위 방문노드는 inDegree - 1 을 해준다 ##
+    for j in preVisit[now]:
+        inDegree[j] -= 1
+    
+    for i in dir_graph[now]:
+        if inDegree[i] == 0 and not visited[i]:
+            cnt += 1
+            dfs(i)
+
+def solution(n, path, order):
+
+    global graph , dir_graph
+    global preVisit
+    global inDegree
+    global visited
+    global cnt
+
+    graph = [[] for _ in range(n)]
+    dir_graph = [[] for _ in range(n)]
+    preVisit = dict()
+
+    for i in range(n):
+        preVisit[i] = []
+
+    inDegree = [0] * n
+    visited = [False] * n
+    
+    for item in path:
+        a , b = item
+        graph[a].append(b)
+        graph[b].append(a)
+
+    getDirection(0)
+    
+    visited = [False] * n
+ 
+    
+    for item in order:
+        a , b = item
+        dir_graph[a].append(b)
+        preVisit[a].append(b)
+        inDegree[b] += 1
+
+    if inDegree[0] == 0:
+        cnt += 1
+        dfs(0)
+        
+        if cnt == n:
+            return True
+        
+    return False
+    
+## 위상정렬을 주로 다룬 문제 + 무방향그래프에서 방향그래프로 바꾸는 과정 다시 한번 적용해봄 ##
+## 위상정렬은 방향그래프에서 사용한다 , 무방향에서 사용해서 처음에 틀림 ##
+## 다시 알아봐야 할 점 : 문제에서 주어진 조건들이 있다. 예를 들면 A -> B -> C 순서가 안되는 점, x -> A or x -> B 가 안되는점 등
+   위 조건들을 왜 주었는지 아직 해결하지 못함 ##

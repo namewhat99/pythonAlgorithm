@@ -1,0 +1,38 @@
+import sys
+import heapq
+input = sys.stdin.readline
+
+n = int(input())
+
+maxheap = []
+minheap = []
+result = []
+for _ in range(n):
+
+    num = int(input())
+
+    if len(maxheap) == len(minheap):
+        heapq.heappush(maxheap , -num)
+    
+    else:
+        heapq.heappush(minheap , num)
+    
+    if maxheap and minheap:
+        if -maxheap[0] > minheap[0]:
+            x , y = -heapq.heappop(maxheap) , heapq.heappop(minheap)
+            heapq.heappush(maxheap , -y)
+            heapq.heappush(minheap , x)
+    
+    result.append(-maxheap[0])
+
+for i in result:
+    print(i)
+    
+## maxheap 과 minheap 으로 나눠서 각각 최대힙 , 최소힙 이다. ##
+## maxheap 에 배열을 양쪽으로 나눴을때 작은값들, minheap 에 큰 값들이 들어간다 ##
+## maxheap 의 len 과 minheap 의 len 이 같으면 maxheap 에 집어넣고 1 이상 차이 나면 minheap 에 집어넣는다.
+
+## 이 과정을 반복하고 만약 minheap의 top 값이 maxheap 의 top 값 보다 크면 값을 바꾼다 ##
+
+## 더 작은값 들 중 max 와 큰 값들 중 mind 을 비교해서 반대로 들어가있으면 바꾸는 방식 ##
+## 

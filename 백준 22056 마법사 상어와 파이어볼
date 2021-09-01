@@ -1,0 +1,92 @@
+import sys
+import copy
+input = sys.stdin.readline
+
+n , m , k = map(int, input().split())
+
+cmd = set()
+visit = dict()
+
+for _ in range(m):
+    y , x , w , s , d = map(int, input().split())
+    cmd.add((y , x , w , s , d))
+
+def move(y , x , speed , direction):
+
+    dx = [0 , 1 , 1 , 1 , 0 , -1 , -1 , -1]
+    dy = [-1 , -1 , 0 , 1 , 1 , 1 , 0 , -1]
+
+    nx = (x + dx[direction] * speed) % n
+    ny = (y + dy[direction] * speed) % n
+
+    return (ny , nx , speed)
+
+
+for _ in range(k):
+
+    visit = dict()
+    newCmd = set()
+    newW , newS , newD = 0 , 0 , []
+    answer = 0
+
+    for moves in cmd:
+
+        y , x , w , s , d = moves
+
+        ny , nx , ns = move(y , x , s , d)
+        visit[(ny , nx)] = visit.get((ny , nx) , 0) + 1
+        newCmd.add((ny , nx , w , s , d))
+
+    cmd = copy.deepcopy(newCmd)
+
+    for coordinates in visit:
+
+        if visit[coordinates] <= 1:
+            continue
+        
+        else:
+
+            newW , newS , newD = 0 , 0 , []
+            cnt = 0
+            ## 문제에서 가장 고민한 부분이다 ##
+            ## 만약 한 좌표에 중복되는 파이어볼이 생기면 그 파이어볼들을 합치고 다시 분리해주는 과정이 필요하다 ##
+            ## 이때, newCmd 를 다시 전부 돌면서 체크하는 것이 비효율적이라는 생각이 들었지만 딱히 생각나는 방법이 없어서 일단 이렇게 풀었다 ##
+            for dupY , dupX , dupW , dupS , dupD in newCmd:
+
+                if dupY == coordinates[0] and dupX == coordinates[1]:
+
+                    newW += dupW
+                    newS += dupS
+                    newD.append(dupD)
+                    cnt += 1
+
+                    cmd.remove((dupY , dupX , dupW , dupS , dupD))
+            ## 다른 방법 / (더 빠름) ##
+            ## 전체 board 가 2차원 배열이니까 각 좌표의 정보를 저장하기 위해 3차원 배열로 만들자 ##
+            ## 예를 들면 1,1의 질량 , 속도를  board[1][1][0] , board[1][1][1] 이렇게 놀으면 각 전체 board를 한번만 돌고도 중복계산을 할 수 있다 ##
+            ## 중복이 없는 좌표는 그대로 cmd에 추가하면 된다 ##
+            
+            flag = 0
+            for i in range(len(newD)):
+                if newD[0] % 2 != newD[i] % 2:
+                    flag = 1
+                    break
+
+            newW  //= 5
+            newS //= cnt
+            if newW > 0:
+                if flag == 0:
+                    for i in [0 , 2 , 4, 6]:
+                        cmd.add((coordinates[0] , coordinates[1] , newW , newS , i))
+            
+                else:
+                    for i in [1 , 3 , 5 , 7]:
+                        cmd.add((coordinates[0] , coordinates[1] , newW , newS , i))
+    print(cmd)
+
+for i in cmd:
+    answer += i[2]
+
+print(answer)
+
+## 전형적인 구현문제, 오랜만에 푸는 빡구현이라 조금 힘들었다, 새로운 아이디어를 얻어가는 문제 ##

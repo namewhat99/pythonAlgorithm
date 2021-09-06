@@ -1,0 +1,78 @@
+import sys
+import bisect
+input = sys.stdin.readline
+
+n , h = map(int, input().split())
+up , down = [] , []
+
+for i in range(n):
+    if i % 2 == 0:
+        down.append(int(input()))
+    else:
+        up.append(int(input()))
+
+down.sort()
+up.sort()
+
+min_line = 0
+min_count = n
+
+for i in range(1 , h + 1):
+
+    up_count = len(up) - bisect.bisect_left(up , i - 0.5)
+    down_count = len(down) - bisect.bisect_left(down , h - i + 0.5)
+
+    cur_count = up_count + down_count
+
+    if cur_count < min_count:
+        min_count = cur_count
+        min_line = 1
+    
+    elif cur_count == min_count:
+        min_line += 1
+
+print(min_count , min_line)
+
+** 이진탐색으로 풀었는데 약간 생소한 방식으로 풀게된 문제 **
+** 맨 처음에는 h 를 파라메트릭 서치를 하면서 탐색을 하나 했으나 그러면 부숴야 하는 라인의 최솟값을 구할 수 없다. h는 무조건 완전탐색 해야한다는 결론 **
+## 이 문제를 각 h 별로 완전탐색을 하면 200,000 * 500,000 으로 TLE 라는 생각 ##
+## 중요한 포인트는 석순 , 종유석을 각각 배열에 저장한 다음 오름차순 정렬 한다. 이때 어느 높이에서 벌레가 부딪히는 벽의 갯수는 len( n // 2 ) - bisect 한 index 가 된다. ##
+## 즉 석순이나 종유석의 순서는 크게 상관이 없음 ##
+## point ) 이진탐색은 정렬된 배열에서 가능하다, 맨 처음에 h 는 파라메트릭 서치로 탐색이 불가능하다는 결론이 나왔을때, 어떤 요소를 정렬해서 혹은 정렬된 요소에서 
+           이진탐색을 적용할 수 있나 생각해 봤으면 수월하게 풀었을 문제일 수 도 있을듯하다 ##
+## 밑에는 같은 방식으로 누적합을 이용하여 푼 풀이 ##
+
+import sys
+import bisect
+input = sys.stdin.readline
+
+n , h = map(int, input().split())
+up , down = [0] * (h + 1) , [0] * (h + 1)
+
+for i in range(n):
+    if i % 2 == 0:
+        down[int(input())] += 1
+    else:
+        up[int(input())] += 1
+
+
+for i in range(h - 1 , 0 , -1):
+    down[i] += down[i + 1]
+    up[i] += up[i + 1]
+
+min_line = 0
+min_count = n
+
+for i in range(1 , h + 1):
+
+    cur_count = up[h - i + 1] + down[i]
+
+    if cur_count < min_count:
+        min_count = cur_count
+        min_line = 1
+    
+    elif cur_count == min_count:
+        min_line += 1
+
+print(min_count , min_line)
+
